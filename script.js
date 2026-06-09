@@ -42,11 +42,18 @@
     const vh = viewport.clientHeight;
     const sw = base.w * state.scale;
     const sh = base.h * state.scale;
+    // v3에서 ⑤ 왕국 분열 버튼 공간을 위해 캔버스를 확장했지만,
+    // 실제로 보여줄 유효 하단은 버튼 바로 아래까지만 잡아 하단 빈 공간 노출을 줄인다.
+    const usefulContentH = 1738;
+    const usefulSh = usefulContentH * state.scale;
     const xMargin = 80;
     if (sw <= vw) state.x = (vw - sw) / 2;
     else state.x = Math.min(xMargin, Math.max(vw - sw - xMargin, state.x));
     if (sh <= vh) state.y = 0;
-    else state.y = Math.min(0, Math.max(vh - sh + 12, state.y));
+    else {
+      const minY = vh - usefulSh + 8;
+      state.y = Math.min(0, Math.max(minY, state.y));
+    }
   }
   function apply() { clampPan(); canvas.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) scale(${state.scale})`; }
   function fitView() {

@@ -8,7 +8,7 @@
   const hubListModal = document.getElementById('hubListModal');
   const hubListClose = document.getElementById('hubListClose');
 
-  const base = { w: 931, h: 1689 };
+  const base = { w: 931, h: 1810 };
   const state = { scale: 1, minScale: 0.35, maxScale: 3.2, x: 0, y: 0 };
   const pointers = new Map();
   let pinchStart = null;

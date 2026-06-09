@@ -1,0 +1,12 @@
+{
+  "name": "CEN Bible 통일왕국 Matrix",
+  "short_name": "통일왕국 Matrix",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#081016",
+  "theme_color": "#081016",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

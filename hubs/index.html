@@ -26,8 +26,6 @@ const HUBS=[
 const $=id=>document.getElementById(id);function currentSlug(){return new URLSearchParams(location.search).get('hub')||'david'}function findHub(slug){return HUBS.find(h=>h.slug===slug)||HUBS[0]}function goMatrix(){location.href='../index.html'}function openDrawer(){$('drawer').classList.add('show')}function closeDrawer(){$('drawer').classList.remove('show')}function goHub(slug){if(!slug)return;location.href='index.html?hub='+slug}function list(items){return `<ul class="list">${items.map(x=>`<li>${x}</li>`).join('')}</ul>`}
 function renderExplore(items){
   function escapeLocal(s){
-    if(typeof esc==='function') return esc(String(s||''));
-    if(typeof escapeHtml==='function') return escapeHtml(String(s||''));
     return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
   function hasEmoji(s){
@@ -37,23 +35,61 @@ function renderExplore(items){
     const t=String(s||'');
     if(/사사/.test(t)) return '⚖️';
     if(/사무엘/.test(t)) return '👴';
-    if(/다윗|왕권|왕국/.test(t)) return '👑';
-    if(/예루살렘|시온|다윗성/.test(t)) return '🏰';
+    if(/다윗성|다윗|왕권|왕국/.test(t)) return '👑';
+    if(/예루살렘|시온/.test(t)) return '🏰';
     if(/언약궤|임재/.test(t)) return '📦';
     if(/성막/.test(t)) return '⛺';
-    if(/성전|예배/.test(t)) return '🏛️';
+    if(/성전|성전산|예배/.test(t)) return '🏛️';
     if(/솔로몬/.test(t)) return '🧠';
     if(/분열|북이스라엘|남유다/.test(t)) return '⚡';
+    if(/십자가/.test(t)) return '✝️';
+    if(/예수|그리스도|메시아/.test(t)) return '✝️';
+    if(/새 예루살렘|새창조/.test(t)) return '👑';
     if(/포로|바벨론/.test(t)) return '⛓️';
     if(/귀환|회복/.test(t)) return '🚶';
-    if(/예수|그리스도|십자가|메시아/.test(t)) return '✝️';
     if(/교회/.test(t)) return '⛪';
-    if(/새창조|새 예루살렘/.test(t)) return '👑';
     return '🔹';
   }
+
+  const labels=[
+    '❓ 핵심질문',
+    '💡 한 줄 핵심',
+    '📖 사건의 의미',
+    '📖 구속사 의미',
+    '🔗 연결 흐름',
+    '🌍 성경 전체 흐름',
+    '🤔 생각해보기'
+  ];
+
+  function splitItem(x){
+    let raw='';
+    if(typeof x==='string'){
+      raw=String(x||'').trim();
+    }else{
+      const t=String(x.title||x.label||'').trim();
+      const body=String(x.text||x.content||x.body||'').trim();
+      raw=(t + (body ? ' ' + body : '')).trim();
+    }
+
+    raw=raw.replace(/\s*\|\s*/g,' ');
+
+    for(const label of labels){
+      if(raw.startsWith(label)){
+        return {title:label, text:raw.slice(label.length).trim()};
+      }
+    }
+
+    if(raw.includes('|')){
+      const a=raw.split('|');
+      return {title:a.shift().trim(), text:a.join('|').trim()};
+    }
+
+    return {title:'', text:raw};
+  }
+
   function verticalFlowHtml(text){
-    const raw=String(text||'').replace(/\s*\|\s*/g,' ').trim();
-    const parts=raw.split(/\s*→\s*/).map(v=>v.trim()).filter(Boolean);
+    const raw=String(text||'').trim();
+    const parts=raw.split(/\s*(?:→|↓)\s*/).map(v=>v.trim()).filter(Boolean);
     if(parts.length<2) return escapeLocal(raw).replace(/\n/g,'<br>');
     return parts.map((step,i)=>{
       const labeled=hasEmoji(step) ? step : `${iconForStep(step)} ${step}`;
@@ -61,32 +97,12 @@ function renderExplore(items){
       return i===parts.length-1 ? line : line + `<span class="flowArrow">↓</span>`;
     }).join('');
   }
-  function normalHtml(text){
-    return escapeLocal(String(text||'').replace(/\s*\|\s*/g,'\n')).replace(/\n/g,'<br>');
-  }
+
   return (items||[]).map(x=>{
-    let title='', text='';
-    if(typeof x==='string'){
-      const s=String(x||'');
-      if(s.includes('|')){
-        const a=s.split('|');
-        title=a.shift().trim();
-        text=a.join('|').trim();
-      }else{
-        text=s.trim();
-      }
-    }else{
-      title=String(x.title||x.label||'').trim();
-      text=String(x.text||x.content||x.body||'').trim();
-    }
-    if(title.includes('|')){
-      const a=title.split('|');
-      title=a.shift().trim();
-      text=a.join('|').trim() + (text ? '\n' + text : '');
-    }
-    const isFlow=/연결\s*흐름|성경\s*전체\s*흐름/.test(title) || text.includes('→');
-    const body=isFlow ? verticalFlowHtml(text) : normalHtml(text);
-    return `<div class="exploreCard">${title?`<b>${escapeLocal(title)}</b>`:''}<p>${body}</p></div>`;
+    const item=splitItem(x);
+    const isFlow=/연결\s*흐름|성경\s*전체\s*흐름/.test(item.title) || item.text.includes('→') || item.text.includes('↓');
+    const body=isFlow ? verticalFlowHtml(item.text) : escapeLocal(item.text).replace(/\n/g,'<br>');
+    return `<div class="exploreCard"><b>${escapeLocal(item.title)}</b><p>${body}</p></div>`;
   }).join('');
 }
 

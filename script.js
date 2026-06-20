@@ -90,12 +90,26 @@
   function endPointer(e){ pointers.delete(e.pointerId); if(pointers.size===2) beginPinch(); else pinchStart=null; if(pointers.size===0) viewport.classList.remove('dragging'); }
   viewport.addEventListener('pointerup', endPointer); viewport.addEventListener('pointercancel', endPointer);
 
+  const hubRoutes = {
+    '다윗 즉위': 'david',
+    '예루살렘 정복': 'jerusalem',
+    '언약궤 이전': 'ark',
+    '성전 건축': 'temple',
+    '왕국 분열': 'division'
+  };
+
   document.querySelectorAll('.button-set button').forEach(btn=>{
     btn.addEventListener('click', e=>{
-      e.stopPropagation(); const group=btn.closest('.button-set'); const eventName=group.dataset.event; const kind=btn.dataset.kind;
-      dialogTitle.textContent = kind === 'link' ? `${eventName} 연결탐험` : `${eventName} 통합탐험`;
-      dialogText.textContent = explore[eventName]?.[kind] || '통일왕국 탐험 내용을 연결합니다.';
-      dialog.showModal();
+      e.stopPropagation();
+      const group = btn.closest('.button-set');
+      const eventName = group?.dataset.event || '';
+      const slug = hubRoutes[eventName];
+      const kind = btn.dataset.kind;
+      const hash = kind === 'link' ? 'connections' : 'integration';
+
+      if(slug){
+        location.href = `hubs/index.html?hub=${slug}#${hash}`;
+      }
     });
   });
 

@@ -1,4 +1,4 @@
-const CACHE = 'cen-united-kingdom-matrix-standard-v5-hash';
+const CACHE = 'cen-united-kingdom-matrix-standard-v6-bible-bridge';
 const ASSETS = [
   './','./index.html','./style.css','./script.js','./manifest.json',
   './assets/united-kingdom-bg.png','./assets/icon-192.png','./assets/icon-512.png',
